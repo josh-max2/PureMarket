@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Kalshi Signal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0c0f14;
+      --surface: #151920;
+      --border: #1f2633;
+      --text: #e2e6ed;
+      --text-muted: #8892a4;
+      --accent: #3b82f6;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    .back {
+      display: inline-block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.2s;
+    }
+
+    .back:hover { color: var(--accent); }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .effective {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 36px;
+      margin-bottom: 12px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    h2:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    p {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back">← Back to Kalshi Signal</a>
+
+    <h1>Privacy Policy</h1>
+    <p class="effective">Effective date: April 3, 2026</p>
+
+    <h2>1. Data We Collect</h2>
+    <p>
+      Kalshi Signal collects TikTok OAuth tokens (an access token and a refresh
+      token) for the sole purpose of posting videos to the authorized TikTok
+      account. The only personal identifier received is the TikTok user open_id
+      provided during the OAuth authorization flow.
+    </p>
+    <p>
+      We do not collect any additional personal data. We do not use tracking
+      technologies, analytics cookies, or advertising identifiers.
+    </p>
+
+    <h2>2. How We Use Your Data</h2>
+    <p>
+      OAuth tokens are used exclusively to publish prediction market analysis
+      videos to the authorized TikTok account via the TikTok Content Posting API.
+      No data is used for any other purpose.
+    </p>
+
+    <h2>3. How We Store Your Data</h2>
+    <p>
+      All data is stored locally on the app operator's machine in an encrypted
+      SQLite database. Data is not stored in the cloud or on any remote server.
+      Refresh tokens are encrypted at rest. Access tokens are automatically
+      refreshed, and expired tokens are overwritten.
+    </p>
+
+    <h2>4. Data Retention</h2>
+    <p>
+      OAuth tokens are retained only as long as needed to maintain the posting
+      integration. Users can revoke access at any time through their TikTok
+      account settings (Settings → Security → Manage app permissions), which
+      immediately invalidates all stored tokens.
+    </p>
+
+    <h2>5. Third-Party Services</h2>
+    <p>
+      Kalshi Signal uses the Kalshi public API to retrieve prediction market data.
+      No user data is shared with Kalshi. The app also uses Anthropic's Claude API
+      for content research and script generation. No TikTok user data is sent to
+      Anthropic.
+    </p>
+
+    <h2>6. Contact</h2>
+    <p>
+      For privacy inquiries, contact us at
+      <!-- REPLACE_EMAIL -->YOUR_EMAIL@EXAMPLE.COM<!-- /REPLACE_EMAIL -->.
+    </p>
+
+    <h2>7. Changes to This Policy</h2>
+    <p>
+      We may update this Privacy Policy from time to time. Changes will be posted
+      on this page with an updated effective date.
+    </p>
+
+    <div class="footer">
+      <p>&copy; 2026 Kalshi Signal · <a href="terms.html">Terms of Service</a></p>
+    </div>
+  </div>
+</body>
+</html>
