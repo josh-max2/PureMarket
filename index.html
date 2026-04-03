@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalshi Signal — Prediction Market Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0c0f14;
+      --surface: #151920;
+      --border: #1f2633;
+      --text: #e2e6ed;
+      --text-muted: #8892a4;
+      --accent: #3b82f6;
+      --accent-dim: rgba(59, 130, 246, 0.12);
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 48px;
+      max-width: 540px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 28px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card h2 .icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .icon-scan { background: rgba(59, 130, 246, 0.12); }
+    .icon-research { background: rgba(34, 197, 94, 0.12); }
+    .icon-publish { background: rgba(239, 68, 68, 0.12); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0 32px;
+    }
+
+    .footer {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+
+    .footer-contact {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .market-ticker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .market-ticker .up { color: var(--green); }
+    .market-ticker .down { color: var(--red); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">Automated Analysis</div>
+
+    <h1>Kalshi <span>Signal</span></h1>
+
+    <p class="subtitle">
+      An automated content platform that monitors prediction markets,
+      detects significant movements, and publishes short-form analysis
+      videos to TikTok.
+    </p>
+
+    <div class="market-ticker">
+      <span>Example:</span>
+      <span>Fed Rate Cut Jun &nbsp;<span class="up">62¢ → 78¢ ↑</span></span>
+      <span style="color:#2a3040;">|</span>
+      <span>BTC &gt; 100K &nbsp;<span class="down">45¢ → 38¢ ↓</span></span>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon icon-scan">📡</span> Monitor Markets</h2>
+      <p>
+        Kalshi Signal continuously scans Kalshi — a CFTC-regulated prediction
+        market exchange — for contracts with significant probability movements,
+        identifying events that are actively repricing in real time.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon icon-research">🔍</span> Research Events</h2>
+      <p>
+        When a significant move is detected, the system researches the underlying
+        news event driving the probability shift, synthesizing context from
+        multiple sources into a concise, accurate narrative.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon icon-publish">🎬</span> Publish Videos</h2>
+      <p>
+        A short-form analysis video is generated and published directly to
+        TikTok, delivering timely prediction market insights to viewers in an
+        accessible, engaging format.
+      </p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="footer">
+      <div class="footer-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+      </div>
+      <p>&copy; 2026 Kalshi Signal. All rights reserved.</p>
+      <p class="footer-contact">
+        Contact: <!-- REPLACE_EMAIL -->YOUR_EMAIL@EXAMPLE.COM<!-- /REPLACE_EMAIL -->
+      </p>
+    </div>
+  </div>
+</body>
+</html>
