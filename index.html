@@ -631,7 +631,7 @@
         log('Upload URL received. Uploading video...', 'ok');
 
         // Step 2: Upload video in chunks to TikTok's upload URL
-        var CHUNK_SIZE = 10485760; // 10MB chunks
+        var CHUNK_SIZE = 67108864; // 10MB chunks
         var totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
         for (var i = 0; i < totalChunks; i++) {
