@@ -611,7 +611,7 @@
 
         var initData = await initRes.json();
 
-        if (initData.error && initData.error.code !== 'ok') {
+        if (initData.error) {
           log('Init error: ' + JSON.stringify(initData.error), 'err');
           publishBtn.disabled = false;
           publishBtn.innerHTML = 'Publish to TikTok';
@@ -630,46 +630,61 @@
 
         log('Upload URL received. Uploading video...', 'ok');
 
-        // Step 2: Upload video directly to TikTok's upload URL
-        var uploadHeaders = {
-          'Content-Type': 'video/mp4',
-          'Content-Length': file.size.toString(),
-          'Content-Range': 'bytes 0-' + (file.size - 1) + '/' + file.size,
-        };
+        // Step 2: Upload video in chunks to TikTok's upload URL
+        var CHUNK_SIZE = 10485760; // 10MB chunks
+        var totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
-        var uploadRes = await fetch(uploadUrl, {
-          method: 'PUT',
-          headers: uploadHeaders,
-          body: file,
-        });
+        for (var i = 0; i < totalChunks; i++) {
+          var start = i * CHUNK_SIZE;
+          var end = Math.min(start + CHUNK_SIZE, file.size);
+          var chunk = file.slice(start, end);
 
-        if (uploadRes.ok) {
-          log('Video uploaded successfully!', 'ok');
-          log('Publish ID: ' + publishId, 'info');
-          log('TikTok is processing your video. It may take a few minutes to appear on your profile.', 'ok');
+          log('Uploading chunk ' + (i + 1) + '/' + totalChunks + ' (' + ((end - start) / 1024 / 1024).toFixed(1) + ' MB)', 'info');
 
-          // Step 3: Check status
-          setTimeout(async function() {
-            try {
-              log('Checking publish status...', 'info');
-              var statusRes = await fetch(WORKER_URL + '/publish-status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  access_token: accessToken,
-                  publish_id: publishId,
-                }),
-              });
-              var statusData = await statusRes.json();
-              log('Status: ' + JSON.stringify(statusData.data || statusData), 'info');
-            } catch (e) {
-              log('Could not check status: ' + e.message, 'err');
-            }
-          }, 5000);
-        } else {
-          var errText = await uploadRes.text();
-          log('Upload failed (' + uploadRes.status + '): ' + errText, 'err');
+          var uploadHeaders = {
+            'Content-Type': 'video/mp4',
+            'Content-Length': (end - start).toString(),
+            'Content-Range': 'bytes ' + start + '-' + (end - 1) + '/' + file.size,
+          };
+
+          var uploadRes = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: uploadHeaders,
+            body: chunk,
+          });
+
+          if (!uploadRes.ok) {
+            var errText = await uploadRes.text();
+            log('Chunk ' + (i + 1) + ' failed (' + uploadRes.status + '): ' + errText, 'err');
+            publishBtn.disabled = false;
+            publishBtn.innerHTML = 'Publish to TikTok';
+            return;
+          }
         }
+
+        log('Video uploaded successfully!', 'ok');
+        log('Publish ID: ' + publishId, 'info');
+        log('TikTok is processing your video. It may take a few minutes to appear on your profile.', 'ok');
+
+        // Step 3: Check status
+        setTimeout(async function() {
+          try {
+            log('Checking publish status...', 'info');
+            var statusRes = await fetch(WORKER_URL + '/publish-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                access_token: accessToken,
+                publish_id: publishId,
+              }),
+            });
+            var statusData = await statusRes.json();
+            log('Status: ' + JSON.stringify(statusData.data || statusData), 'info');
+          } catch (e) {
+            log('Could not check status: ' + e.message, 'err');
+          }
+        }, 5000);
+
       } catch (err) {
         log('Error: ' + err.message, 'err');
       }
