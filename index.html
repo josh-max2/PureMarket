@@ -611,7 +611,7 @@
 
         var initData = await initRes.json();
 
-        if (initData.error) {
+        if (initData.error && initData.error.code !== 'ok') {
           log('Init error: ' + JSON.stringify(initData.error), 'err');
           publishBtn.disabled = false;
           publishBtn.innerHTML = 'Publish to TikTok';
