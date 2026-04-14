@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connecting — PureMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0c0f14;
+      --surface: #151920;
+      --border: #1f2633;
+      --text: #e2e6ed;
+      --text-muted: #8892a4;
+      --accent: #3b82f6;
+      --green: #22c55e;
+      --green-dim: rgba(34, 197, 94, 0.10);
+      --red: #ef4444;
+      --red-dim: rgba(239, 68, 68, 0.10);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 440px;
+      width: 100%;
+      margin: 24px;
+    }
+
+    .icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    .icon-circle.loading {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent);
+    }
+
+    .icon-circle.success {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    .icon-circle.error {
+      background: var(--red-dim);
+      color: var(--red);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .error-detail {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--red);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      word-break: break-all;
+      display: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--accent);
+      color: #fff;
+      margin-top: 16px;
+    }
+
+    .btn:hover { background: #2563eb; }
+
+    .logo {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 28px;
+    }
+
+    .logo span { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-circle loading" id="statusIcon"><div class="spinner"></div></div>
+    <h1 id="statusTitle">Connecting to TikTok...</h1>
+    <p id="statusMsg">PureMarket is exchanging your authorization. This only takes a moment.</p>
+    <div class="error-detail" id="errorDetail"></div>
+    <a href="index.html" class="btn" id="continueBtn" style="display:none;">Continue to dashboard</a>
+    <div class="logo">Pure<span>Market</span></div>
+  </div>
+
+  <script>
+    var WORKER_URL = 'https://puremarket-api.joshscottason.workers.dev';
+
+    async function handleCallback() {
+      var params = new URLSearchParams(window.location.search);
+      var code = params.get('code');
+      var error = params.get('error');
+
+      if (error) {
+        showError('Authorization denied', 'TikTok authorization was denied or encountered an error. Please try again.');
+        return;
+      }
+
+      if (!code) {
+        showError('No authorization data', 'This page handles the TikTok OAuth callback for PureMarket. Please start the connection from the dashboard.');
+        return;
+      }
+
+      try {
+        var res = await fetch(WORKER_URL + '/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: code }),
+        });
+
+        var data = await res.json();
+
+        if (data.access_token) {
+          sessionStorage.setItem('tiktok_access_token', data.access_token);
+          sessionStorage.setItem('tiktok_refresh_token', data.refresh_token || '');
+          sessionStorage.setItem('tiktok_open_id', data.open_id || '');
+          sessionStorage.setItem('tiktok_connected', 'true');
+
+          document.getElementById('statusIcon').className = 'icon-circle success';
+          document.getElementById('statusIcon').innerHTML = '&#10003;';
+          document.getElementById('statusTitle').textContent = 'TikTok connected!';
+          document.getElementById('statusMsg').textContent = 'PureMarket has been authorized to post videos to your TikTok account.';
+          document.getElementById('continueBtn').style.display = 'inline-flex';
+        } else {
+          var errMsg = data.error_description || data.error || JSON.stringify(data);
+          showError('Connection failed', 'Could not get access token from TikTok.', errMsg);
+        }
+      } catch (err) {
+        showError('Connection error', 'Could not reach the PureMarket server.', err.message);
+      }
+    }
+
+    function showError(title, msg, detail) {
+      document.getElementById('statusIcon').className = 'icon-circle error';
+      document.getElementById('statusIcon').innerHTML = '&#10007;';
+      document.getElementById('statusTitle').textContent = title;
+      document.getElementById('statusMsg').textContent = msg;
+      document.getElementById('continueBtn').style.display = 'inline-flex';
+      document.getElementById('continueBtn').textContent = 'Back to PureMarket';
+
+      if (detail) {
+        document.getElementById('errorDetail').style.display = 'block';
+        document.getElementById('errorDetail').textContent = detail;
+      }
+    }
+
+    handleCallback();
+  </script>
+</body>
+</html>
