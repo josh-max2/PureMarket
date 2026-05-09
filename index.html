@@ -320,7 +320,7 @@
       margin-bottom: 6px;
     }
 
-    .field-group input,
+    .field-group input:not([type="checkbox"]):not([type="radio"]),
     .field-group select,
     .field-group textarea {
       width: 100%;
@@ -333,6 +333,17 @@
       font-size: 14px;
       outline: none;
       transition: border-color 0.2s;
+    }
+    .field-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: none;
+      flex-shrink: 0;
+      cursor: pointer;
+      accent-color: var(--accent);
     }
 
     .field-group input:focus,
