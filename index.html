@@ -492,19 +492,27 @@
     .disclosure-options label {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
+      gap: 12px;
       font-size: 13px;
-      color: var(--text);
+      color: var(--text-muted);
       cursor: pointer;
       font-weight: 400;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
+      line-height: 1.5;
     }
     .disclosure-options label:last-of-type { margin-bottom: 0; }
-    .disclosure-options input { margin-top: 3px; cursor: pointer; }
+    .disclosure-options label strong {
+      color: var(--text);
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .disclosure-options input { margin-top: 3px; cursor: pointer; flex-shrink: 0; }
     .disclosure-warn {
       font-size: 12px;
       color: var(--red);
-      margin-top: 10px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
       display: none;
     }
     .disclosure-warn.show { display: block; }
@@ -697,7 +705,15 @@
     function toggleDisclosure() {
       var on = document.getElementById('discloseContent').checked;
       document.getElementById('disclosureOptions').style.display = on ? 'block' : 'none';
-      validateDisclosure();
+      // Clear any stale warning when user opens/closes the panel — only re-validate on
+      // brand selection, privacy change, or publish click.
+      var warn = document.getElementById('disclosureWarn');
+      warn.classList.remove('show');
+      warn.textContent = '';
+      if (!on) {
+        document.getElementById('brandOrganic').checked = false;
+        document.getElementById('brandContent').checked = false;
+      }
     }
 
     function validateDisclosure() {
