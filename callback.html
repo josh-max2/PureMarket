@@ -192,20 +192,24 @@
           document.getElementById('statusMsg').textContent = 'PureMarket has been authorized to post videos to your TikTok account.';
           document.getElementById('continueBtn').style.display = 'inline-flex';
 
-          // Also expose the tokens for one-time copy to the local pipeline.
-          var tokenJson = JSON.stringify({
-            access_token: data.access_token,
-            refresh_token: data.refresh_token || '',
-            expires_in: data.expires_in || null,
-            refresh_expires_in: data.refresh_expires_in || null,
-            open_id: data.open_id || '',
-            scope: data.scope || '',
-            token_type: data.token_type || 'Bearer'
-          }, null, 2);
-          var tokenBox = document.getElementById('tokenBox');
-          var tokenJsonEl = document.getElementById('tokenJson');
-          tokenJsonEl.textContent = tokenJson;
-          tokenBox.style.display = 'block';
+          // Token JSON is hidden by default. Show only when the OAuth URL was
+          // started with ?showToken=1 (used by the local pipeline when adding
+          // a new channel — never shown during a normal user/audit flow).
+          if (params.get('showToken') === '1') {
+            var tokenJson = JSON.stringify({
+              access_token: data.access_token,
+              refresh_token: data.refresh_token || '',
+              expires_in: data.expires_in || null,
+              refresh_expires_in: data.refresh_expires_in || null,
+              open_id: data.open_id || '',
+              scope: data.scope || '',
+              token_type: data.token_type || 'Bearer'
+            }, null, 2);
+            var tokenBox = document.getElementById('tokenBox');
+            var tokenJsonEl = document.getElementById('tokenJson');
+            tokenJsonEl.textContent = tokenJson;
+            tokenBox.style.display = 'block';
+          }
         } else {
           var errMsg = data.error_description || data.error || JSON.stringify(data);
           showError('Connection failed', 'Could not get access token from TikTok.', errMsg);
