@@ -415,6 +415,100 @@
       margin-top: 4px;
     }
 
+    .creator-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .creator-info .creator-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--bg);
+    }
+    .creator-info .creator-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .creator-info .creator-nickname {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 8px;
+    }
+    .checkbox-row label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 400;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .disclosure-toggle {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .disclosure-toggle input { margin-top: 3px; cursor: pointer; }
+    .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .disclosure-options {
+      margin-top: 12px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .disclosure-options label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+    .disclosure-options label:last-of-type { margin-bottom: 0; }
+    .disclosure-options input { margin-top: 3px; cursor: pointer; }
+    .disclosure-warn {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 10px;
+      display: none;
+    }
+    .disclosure-warn.show { display: block; }
+
     @media (max-width: 700px) {
       h1 { font-size: 32px; }
       .steps { grid-template-columns: 1fr; }
@@ -494,6 +588,14 @@
         </div>
 
         <div class="upload-area" id="uploadArea">
+          <div class="creator-info" id="creatorInfo" style="display:none;">
+            <img class="creator-avatar" id="creatorAvatar" alt="">
+            <div>
+              <div class="creator-label">Posting as</div>
+              <div class="creator-nickname" id="creatorNickname">@username</div>
+            </div>
+          </div>
+
           <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
             <div class="upload-icon">&#8682;</div>
             <p>Click to select or drag a video file (MP4)</p>
@@ -508,11 +610,33 @@
 
           <div class="field-group">
             <label for="privacy">Privacy level</label>
-            <select id="privacy">
+            <select id="privacy" onchange="validateDisclosure()">
               <option value="SELF_ONLY">Only me</option>
               <option value="MUTUAL_FOLLOW_FRIENDS">Friends only</option>
               <option value="PUBLIC_TO_EVERYONE">Public</option>
             </select>
+          </div>
+
+          <div class="field-group">
+            <label>Allow viewers to</label>
+            <div class="checkbox-row">
+              <label><input type="checkbox" id="allowComment" checked> Comment</label>
+              <label><input type="checkbox" id="allowDuet" checked> Duet</label>
+              <label><input type="checkbox" id="allowStitch" checked> Stitch</label>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="disclosure-toggle">
+              <input type="checkbox" id="discloseContent" onchange="toggleDisclosure()">
+              <span>Disclose video content</span>
+            </label>
+            <p class="hint">Turn on to disclose that this video promotes yourself, a third party, or both. This will turn off the ability to upload as private.</p>
+            <div class="disclosure-options" id="disclosureOptions" style="display:none;">
+              <label><input type="checkbox" id="brandOrganic" onchange="validateDisclosure()"> <span><strong>Your Brand</strong> — content promotes yourself, your business, or your products.</span></label>
+              <label><input type="checkbox" id="brandContent" onchange="validateDisclosure()"> <span><strong>Branded Content</strong> — content promotes a third-party brand, product, or service in exchange for compensation.</span></label>
+              <p class="disclosure-warn" id="disclosureWarn"></p>
+            </div>
           </div>
 
           <div class="form-actions">
@@ -570,6 +694,55 @@
       logEl.scrollTop = logEl.scrollHeight;
     }
 
+    function toggleDisclosure() {
+      var on = document.getElementById('discloseContent').checked;
+      document.getElementById('disclosureOptions').style.display = on ? 'block' : 'none';
+      validateDisclosure();
+    }
+
+    function validateDisclosure() {
+      var disclose = document.getElementById('discloseContent').checked;
+      var brandOrganic = document.getElementById('brandOrganic').checked;
+      var brandContent = document.getElementById('brandContent').checked;
+      var privacy = document.getElementById('privacy').value;
+      var warn = document.getElementById('disclosureWarn');
+      warn.classList.remove('show');
+      warn.textContent = '';
+      if (!disclose) return true;
+      if (!brandOrganic && !brandContent) {
+        warn.textContent = 'You must select at least one disclosure type.';
+        warn.classList.add('show');
+        return false;
+      }
+      if (brandContent && privacy === 'SELF_ONLY') {
+        warn.textContent = 'Branded Content cannot be posted privately. Change Privacy level or uncheck Branded Content.';
+        warn.classList.add('show');
+        return false;
+      }
+      return true;
+    }
+
+    async function fetchCreatorInfo() {
+      var accessToken = sessionStorage.getItem('tiktok_access_token');
+      if (!accessToken) return;
+      try {
+        var res = await fetch(WORKER_URL + '/creator-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: accessToken }),
+        });
+        var payload = await res.json();
+        var info = payload.data || payload;
+        var nick = info.creator_nickname || info.nickname || info.display_name;
+        var avatar = info.creator_avatar_url || info.avatar_url || info.avatar_url_100;
+        if (nick) {
+          document.getElementById('creatorNickname').textContent = '@' + nick;
+          if (avatar) document.getElementById('creatorAvatar').src = avatar;
+          document.getElementById('creatorInfo').style.display = 'flex';
+        }
+      } catch (e) { /* graceful degrade — endpoint may not yet be deployed */ }
+    }
+
     async function publishVideo() {
       var fileInput = document.getElementById('fileInput');
       var caption = document.getElementById('caption').value;
@@ -586,6 +759,18 @@
         alert('Please connect your TikTok account first.');
         return;
       }
+
+      if (!validateDisclosure()) {
+        alert('Please fix the disclosure settings before publishing.');
+        return;
+      }
+
+      var disableComment = !document.getElementById('allowComment').checked;
+      var disableDuet = !document.getElementById('allowDuet').checked;
+      var disableStitch = !document.getElementById('allowStitch').checked;
+      var discloseContent = document.getElementById('discloseContent').checked;
+      var brandOrganic = discloseContent && document.getElementById('brandOrganic').checked;
+      var brandContent = discloseContent && document.getElementById('brandContent').checked;
 
       var file = fileInput.files[0];
       publishBtn.disabled = true;
@@ -606,6 +791,11 @@
             video_size: file.size,
             caption: caption || 'Prediction market analysis #PureMarket #predictions',
             privacy_level: privacy,
+            disable_comment: disableComment,
+            disable_duet: disableDuet,
+            disable_stitch: disableStitch,
+            brand_content_toggle: brandContent,
+            brand_organic_toggle: brandOrganic,
           }),
         });
 
@@ -703,6 +893,7 @@
         document.getElementById('uploadArea').classList.add('active');
         document.getElementById('statusBadge').className = 'status-badge connected';
         document.getElementById('statusBadge').innerHTML = '<span class="status-dot"></span> Connected';
+        fetchCreatorInfo();
       }
     });
 
